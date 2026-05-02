@@ -1,109 +1,206 @@
 import React, { useEffect, useState } from "react";
 import "./Cart.css";
 
-const getDeliveryFee = (location) => {
-    if (!location) return 100;
-
-    const city = location.toLowerCase();
-
-    if (city.includes("cairo") || city.includes("القاهرة")) return 50;
-    if (city.includes("giza") || city.includes("الجيزة")) return 60;
-    if (city.includes("alex") || city.includes("alexandria") || city.includes("اسكندرية")) return 90;
-    if (city.includes("mansoura") || city.includes("المنصورة")) return 80;
-    if (city.includes("tanta") || city.includes("طنطا")) return 75;
-
-    return 100;
+const governorateFees = {
+    Cairo: 50,
+    Giza: 60,
+    Alexandria: 90,
+    Mansoura: 80,
+    Tanta: 75,
+    Aswan: 120,
+    Luxor: 110,
+    Ismailia: 85,
+    Suez: 85,
 };
 
 function Cart() {
     const [cart, setCart] = useState([]);
     const [paymentMethod, setPaymentMethod] = useState("");
-    const isLoggedIn = localStorage.getItem("token") || localStorage.getItem("user");
+    const [governorate, setGovernorate] = useState("");
+
+    const [popup, setPopup] = useState({
+        show: false,
+        message: "",
+        type: "",
+    });
+
+    const isLoggedIn =
+        localStorage.getItem("token") || localStorage.getItem("user");
 
     useEffect(() => {
         setCart(JSON.parse(localStorage.getItem("petCart")) || []);
     }, []);
 
-    const removeFromCart = (id) => {
-        const updatedCart = cart.filter((pet) => pet._id !== id);
-        setCart(updatedCart);
-        localStorage.setItem("petCart", JSON.stringify(updatedCart));
-        window.dispatchEvent(new Event("storageUpdated"));
+    const showPopup = (message, type) => {
+        setPopup({
+            show: true,
+            message,
+            type,
+        });
+
+        setTimeout(() => {
+            setPopup({
+                show: false,
+                message: "",
+                type: "",
+            });
+        }, 2500);
     };
 
-    const total = cart.reduce((sum, pet) => {
-        return sum + Number(pet.donationFee || 0) + getDeliveryFee(pet.location);
+    const removeFromCart = (id) => {
+        const updatedCart = cart.filter((pet) => pet._id !== id);
+
+        setCart(updatedCart);
+
+        localStorage.setItem("petCart", JSON.stringify(updatedCart));
+
+        window.dispatchEvent(new Event("storageUpdated"));
+
+        showPopup("Pet removed from cart", "success");
+    };
+
+    const deliveryFee = governorateFees[governorate] || 0;
+
+    const donationTotal = cart.reduce((sum, pet) => {
+        return sum + Number(pet.donationFee || 0);
     }, 0);
+
+    const total = donationTotal + deliveryFee;
 
     const confirmOrder = () => {
         if (!isLoggedIn) {
-            alert("You must login first to confirm adoption order");
+            showPopup(
+                "You must login first to confirm adoption order",
+                "error"
+            );
+            return;
+        }
+
+        if (!governorate) {
+            showPopup("Please choose your governorate", "error");
             return;
         }
 
         if (!paymentMethod) {
-            alert("Please choose payment method");
+            showPopup("Please choose payment method", "error");
             return;
         }
 
-        alert("Order confirmed successfully");
+        showPopup("Order confirmed successfully 🐾", "success");
     };
 
     return (
         <div className="cart-page">
+            {popup.show && (
+                <div className={`popup ${popup.type}`}>
+                    {popup.message}
+                </div>
+            )}
+
             <h1>Your Cart</h1>
 
             {cart.length === 0 ? (
                 <p>Your cart is empty</p>
             ) : (
                 <>
-                    {cart.map((pet) => {
-                        const delivery = getDeliveryFee(pet.location);
-                        const itemTotal = Number(pet.donationFee || 0) + delivery;
+                    {cart.map((pet) => (
+                        <div className="cart-item" key={pet._id}>
+                            <img src={pet.image} alt={pet.name} />
 
-                        return (
-                            <div className="cart-item" key={pet._id}>
-                                <img src={pet.image} alt={pet.name} />
+                            <div>
+                                <h3>{pet.name}</h3>
 
-                                <div>
-                                    <h3>{pet.name}</h3>
-                                    <p>Donation Fee: {pet.donationFee} EGP</p>
-                                    <p>Delivery Fee: {delivery} EGP</p>
-                                    <strong>Total: {itemTotal} EGP</strong>
-                                    <p className="note">
-                                        These symbolic fees support donations, food, vaccination,
-                                        and rescue care.
-                                    </p>
-                                </div>
+                                <p>Breed: {pet.breed}</p>
 
-                                <button onClick={() => removeFromCart(pet._id)}>Remove</button>
+                                <p>
+                                    Donation Fee: {pet.donationFee || 0} EGP
+                                </p>
+
+                                <p className="note">
+                                    These symbolic fees support donations,
+                                    food, vaccination, and rescue care.
+                                </p>
                             </div>
-                        );
-                    })}
+
+                            <button onClick={() => removeFromCart(pet._id)}>
+                                Remove
+                            </button>
+                        </div>
+                    ))}
 
                     <div className="checkout-box">
                         <h2>Checkout</h2>
 
-                        <label>Payment Method</label>
+                        <label>Choose Your Governorate</label>
+
                         <select
-                            value={paymentMethod}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
+                            value={governorate}
+                            onChange={(e) => setGovernorate(e.target.value)}
                         >
-                            <option value="">Choose payment method</option>
-                            <option value="cash">Cash on Delivery</option>
-                            <option value="card">Card</option>
-                            <option value="wallet">Mobile Wallet</option>
+                            <option value="">
+                                Select governorate
+                            </option>
+
+                            {Object.keys(governorateFees).map((gov) => (
+                                <option key={gov} value={gov}>
+                                    {gov}
+                                </option>
+                            ))}
                         </select>
 
-                        <h3>Total Payment: {total} EGP</h3>
-
-                        {!isLoggedIn && (
-                            <p className="login-warning">
-                                You must login first before confirming the order.
+                        {governorate && (
+                            <p>
+                                Delivery Fee: {deliveryFee} EGP
                             </p>
                         )}
 
-                        <button onClick={confirmOrder}>Confirm Order</button>
+                        <label>Payment Method</label>
+
+                        <select
+                            value={paymentMethod}
+                            onChange={(e) =>
+                                setPaymentMethod(e.target.value)
+                            }
+                        >
+                            <option value="">
+                                Choose payment method
+                            </option>
+
+                            <option value="cash">
+                                Cash on Delivery
+                            </option>
+
+                            <option value="card">
+                                Card
+                            </option>
+
+                            <option value="wallet">
+                                Mobile Wallet
+                            </option>
+                        </select>
+
+                        <p>
+                            Donation Total: {donationTotal} EGP
+                        </p>
+
+                        <p>
+                            Delivery Fee: {deliveryFee} EGP
+                        </p>
+
+                        <h3>
+                            Total Payment: {total} EGP
+                        </h3>
+
+                        {!isLoggedIn && (
+                            <p className="login-warning">
+                                You must login first before confirming
+                                the order.
+                            </p>
+                        )}
+
+                        <button onClick={confirmOrder}>
+                            Confirm Order
+                        </button>
                     </div>
                 </>
             )}
