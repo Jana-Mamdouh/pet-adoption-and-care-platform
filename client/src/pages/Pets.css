@@ -1,0 +1,49 @@
+.pets-page {
+    min-height: 100vh;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    background: #fff7f4;
+    padding: 40px 40px;
+    box-sizing: border-box;
+}
+
+.pets-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.filters {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 35px;
+    flex-wrap: wrap;
+}
+
+.pets-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 380px));
+    gap: 34px;
+    justify-content: center;
+}
+
+.pets-header p {
+    color: #9b7f8d;
+    font-size: 20px;
+}
+
+
+.filters input,
+.filters select {
+    padding: 14px 18px;
+    border-radius: 18px;
+    border: 1px solid #f5dce6;
+    font-size: 16px;
+    outline: none;
+}
+
+.filters input {
+    width: 350px;
+}

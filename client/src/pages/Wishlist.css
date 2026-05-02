@@ -1,0 +1,15 @@
+.wishlist-page {
+    min-height: 100vh;
+    background: #fff7f4;
+    padding: 40px 80px;
+}
+
+.wishlist-page h1 {
+    color: #5d4a52;
+}
+
+.wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 34px;
+}

@@ -1,0 +1,119 @@
+.pet-card {
+    width: 100%;
+    max-width: 380px;
+    background: #ffffff;
+    border-radius: 24px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.pet-image-box {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    overflow: hidden;
+}
+
+.pet-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.heart-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    color: #9b7f8d;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.pet-tags {
+    position: absolute;
+    bottom: 18px;
+    left: 18px;
+    display: flex;
+    gap: 10px;
+}
+
+.tag {
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.pink {
+    background: #f48aaa;
+    color: white;
+}
+
+.purple {
+    background: #c6b1dd;
+    color: #5f4b5b;
+}
+
+.pet-info {
+    padding: 24px;
+}
+
+.pet-info h3 {
+    margin: 0;
+    color: #5d4a52;
+    font-size: 24px;
+}
+
+.breed,
+.details {
+    color: #9b7f8d;
+    font-size: 16px;
+}
+
+.price-box {
+    background: #fff7f4;
+    padding: 12px;
+    border-radius: 16px;
+    margin: 14px 0;
+    color: #5d4a52;
+}
+
+.donation-note {
+    color: #9b7f8d;
+    font-size: 13px;
+}
+
+.card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.details-btn,
+.adopt-btn {
+    flex: 1;
+    height: 48px;
+    border-radius: 22px;
+    border: none;
+    text-decoration: none;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.details-btn {
+    background: #f5dce6;
+    color: #5d4a52;
+}
+
+.adopt-btn {
+    background: #b9ead8;
+    color: #5d4a52;
+}
