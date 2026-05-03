@@ -1,49 +1,103 @@
 .pets-page {
     min-height: 100vh;
-    width: 100%;
-    max-width: 100vw;
-    overflow-x: hidden;
     background: #fff7f4;
-    padding: 40px 40px;
-    box-sizing: border-box;
+    padding: 45px 80px;
+    font-family: Arial, sans-serif;
 }
 
 .pets-header {
-    text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 24px;
+}
+
+.pets-header h1 {
+    font-size: 54px;
+    color: #111;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+.pets-header p {
+    color: #5d4a52;
+    font-size: 22px;
 }
 
 .filters {
     display: flex;
-    justify-content: center;
-    gap: 15px;
+    align-items: center;
+    gap: 14px;
     margin-bottom: 35px;
     flex-wrap: wrap;
 }
 
-.pets-grid {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 380px));
-    gap: 34px;
-    justify-content: center;
-}
-
-.pets-header p {
-    color: #9b7f8d;
-    font-size: 20px;
-}
-
-
-.filters input,
-.filters select {
-    padding: 14px 18px;
-    border-radius: 18px;
-    border: 1px solid #f5dce6;
-    font-size: 16px;
-    outline: none;
-}
-
 .filters input {
-    width: 350px;
+    width: 360px;
+    height: 48px;
+    border: 1px solid #f3c2d0;
+    border-radius: 24px;
+    padding: 0 18px;
+    outline: none;
+    color: #5d4a52;
+    font-size: 16px;
+    background: white;
+    box-shadow: 0 6px 18px rgba(255, 182, 193, 0.16);
+}
+
+.filters select {
+    width: 160px;
+    height: 48px;
+    border: 1px solid #f3c2d0;
+    border-radius: 24px;
+    padding: 0 14px;
+    outline: none;
+    color: #5d4a52;
+    font-size: 16px;
+    background: white;
+    box-shadow: 0 6px 18px rgba(255, 182, 193, 0.16);
+    cursor: pointer;
+}
+
+.filters input:focus,
+.filters select:focus {
+    border-color: #f48aaa;
+}
+
+.pets-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(260px, 1fr));
+    gap: 35px;
+    align-items: stretch;
+}
+
+@media (max-width: 1100px) {
+    .pets-grid {
+        grid-template-columns: repeat(2, minmax(260px, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .pets-page {
+        padding: 30px 20px;
+    }
+
+    .pets-header h1 {
+        font-size: 38px;
+    }
+
+    .pets-header p {
+        font-size: 18px;
+    }
+
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filters input,
+    .filters select {
+        width: 100%;
+    }
+
+    .pets-grid {
+        grid-template-columns: 1fr;
+    }
 }

@@ -1,75 +1,139 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./MyApplications.css";
 
 function MyApplications() {
+    const [email, setEmail] = useState("");
     const [applications, setApplications] = useState([]);
+    const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const getApplications = async () => {
-        const response = await fetch("http://localhost:4000/api/applications/my-applications");
-        const data = await response.json();
+    const fetchApplications = async () => {
+        setMessage("");
 
-        if (data.success) {
-            setApplications(data.applications);
+        if (email.trim() === "") {
+            setApplications([]);
+            setMessage("Please enter your email first to view your applications.");
+            return;
         }
+
+        setLoading(true);
+
+        try {
+            const url = `http://localhost:4000/api/applications/my-applications?email=${email.trim()}`;
+
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (response.ok) {
+                setApplications(data);
+
+                if (data.length === 0) {
+                    setMessage("No applications found for this email.");
+                }
+            } else {
+                setMessage(data.message || "Something went wrong");
+            }
+        } catch (error) {
+            setMessage("Cannot connect to server");
+        }
+
+        setLoading(false);
     };
 
-    useEffect(() => {
-        getApplications();
-    }, []);
-
-    const pending = applications.filter((app) => app.status === "pending").length;
-    const approved = applications.filter((app) => app.status === "approved").length;
-    const rejected = applications.filter((app) => app.status === "rejected").length;
+    const pendingCount = applications.filter((app) => app.status === "pending").length;
+    const approvedCount = applications.filter((app) => app.status === "approved").length;
+    const rejectedCount = applications.filter((app) => app.status === "rejected").length;
 
     return (
         <div className="applications-page">
             <h1>My Applications</h1>
 
+            <p className="applications-subtitle">
+                Please enter the same email you used in the adoption form to view your applications.
+            </p>
+
+            <div className="applications-search">
+                <input
+                    type="email"
+                    placeholder="Write your email first"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+
+                <button onClick={fetchApplications} disabled={loading}>
+                    {loading ? "Loading..." : "View Applications"}
+                </button>
+            </div>
+
+            {message && <h3 className="applications-message">{message}</h3>}
+
             <div className="stats-grid">
                 <div className="stat-card">
-                    <h3>Total Applications</h3>
+                    <h3>Total</h3>
                     <p>{applications.length}</p>
                 </div>
 
                 <div className="stat-card">
                     <h3>Pending</h3>
-                    <p>{pending}</p>
+                    <p>{pendingCount}</p>
                 </div>
 
                 <div className="stat-card">
                     <h3>Approved</h3>
-                    <p>{approved}</p>
+                    <p>{approvedCount}</p>
                 </div>
 
                 <div className="stat-card">
                     <h3>Rejected</h3>
-                    <p>{rejected}</p>
+                    <p>{rejectedCount}</p>
                 </div>
             </div>
 
-            {applications.length === 0 ? (
-                <p>No applications yet.</p>
-            ) : (
-                <div className="applications-list">
-                    {applications.map((app) => (
-                        <div className="application-card" key={app._id}>
-                            <img src={app.pet?.image} alt={app.pet?.name} />
+            <div className="applications-list">
+                {applications.map((application) => (
+                    <div className="application-card" key={application._id}>
+                        {application.petImage && (
+                            <img src={application.petImage} alt={application.petName} />
+                        )}
 
-                            <div>
-                                <h3>{app.pet?.name}</h3>
-                                <p>Breed: {app.pet?.breed}</p>
-                                <p>Phone: {app.phone}</p>
-                                <p>Status: <span className={`status ${app.status}`}>{app.status}</span></p>
-                                <p>Message: {app.message}</p>
+                        <div>
+                            <h2>{application.petName}</h2>
 
-                                {app.rejectionReason && (
-                                    <p>Rejection Reason: {app.rejectionReason}</p>
-                                )}
-                            </div>
+                            <p>
+                                <strong>Name:</strong> {application.userName}
+                            </p>
+
+                            <p>
+                                <strong>Email:</strong> {application.userEmail}
+                            </p>
+
+                            <p>
+                                <strong>Phone:</strong> {application.phone}
+                            </p>
+
+                            <p>
+                                <strong>Address:</strong> {application.address}
+                            </p>
+
+                            <p>
+                                <strong>Reason:</strong> {application.reason}
+                            </p>
+
+                            <p>
+                                <strong>Status:</strong>{" "}
+                                <span className={`status ${application.status}`}>
+                                    {application.status}
+                                </span>
+                            </p>
+
+                            <p>
+                                <strong>Submitted:</strong>{" "}
+                                {new Date(application.createdAt).toLocaleDateString()}
+                            </p>
                         </div>
-                    ))}
-                </div>
-            )}
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }

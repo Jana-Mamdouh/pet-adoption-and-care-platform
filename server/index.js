@@ -4,6 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const petRoutes = require("./routes/petRoutes");
+const applicationRoutes = require("./routes/applicationRoutes");
 
 const app = express();
 
@@ -14,13 +15,16 @@ app.use(express.json());
 app.get("/test", (req, res) => {
     res.json({ message: "Server is working" });
 });
+
 // MongoDB Connection
 mongoose
     .connect(process.env.MONGODB_URI)
     .then(() => console.log("MongoDB connected"))
     .catch((err) => console.log(err));
+
 // Routes
 app.use("/api/pets", petRoutes);
+app.use("/api/applications", applicationRoutes);
 
 // Test Route
 app.get("/", (req, res) => {

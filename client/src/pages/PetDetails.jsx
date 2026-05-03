@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import "./PetDetails.css";
 
 function PetDetails() {
@@ -7,11 +7,15 @@ function PetDetails() {
     const [pet, setPet] = useState(null);
 
     const getPetDetails = async () => {
-        const response = await fetch(`http://localhost:4000/api/pets/${id}`);
-        const data = await response.json();
+        try {
+            const response = await fetch(`http://localhost:4000/api/pets/${id}`);
+            const data = await response.json();
 
-        if (data.success) {
-            setPet(data.pet);
+            if (data.success) {
+                setPet(data.pet);
+            }
+        } catch (error) {
+            console.log("Error fetching pet details:", error);
         }
     };
 
@@ -60,6 +64,14 @@ function PetDetails() {
                             vaccination, and pet rescue support.
                         </span>
                     </div>
+
+                    <Link
+                        to={`/apply-adoption/${pet._id}`}
+                        state={{ pet: pet }}
+                        className="apply-btn"
+                    >
+                        Apply for Adoption
+                    </Link>
                 </div>
             </div>
         </div>
