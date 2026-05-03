@@ -1,0 +1,69 @@
+.applications-page {
+    min-height: 100vh;
+    background: #fff7f4;
+    padding: 40px 80px;
+}
+
+.applications-page h1 {
+    color: #5d4a52;
+    margin-bottom: 30px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 35px;
+}
+
+.stat-card,
+.application-card {
+    background: white;
+    border-radius: 24px;
+    padding: 22px;
+    box-shadow: 0 8px 25px rgba(255, 182, 193, 0.25);
+}
+
+.stat-card h3 {
+    color: #9b7f8d;
+}
+
+.stat-card p {
+    font-size: 32px;
+    font-weight: 800;
+    color: #f48aaa;
+}
+
+.application-card {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 20px;
+}
+
+.application-card img {
+    width: 170px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 18px;
+}
+
+.status {
+    padding: 6px 14px;
+    border-radius: 18px;
+    font-weight: 700;
+}
+
+.status.pending {
+    background: #fff0c2;
+    color: #8a6d00;
+}
+
+.status.approved {
+    background: #b9ead8;
+    color: #234b3a;
+}
+
+.status.rejected {
+    background: #ffd1dc;
+    color: #9b1c42;
+}

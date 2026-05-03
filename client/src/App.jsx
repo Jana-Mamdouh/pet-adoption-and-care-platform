@@ -7,7 +7,8 @@ import PetDetails from "./pages/PetDetails";
 import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
 import Login from "./pages/Login";
-
+import ApplyAdoption from "./pages/ApplyAdoption";
+import MyApplications from "./pages/MyApplications";
 function App() {
   return (
     <BrowserRouter>
@@ -26,6 +27,8 @@ function App() {
         <Route path="/contact" element={<h1>Contact Page</h1>} />
 
         <Route path="/adoption-tips" element={<h1>Adoption Tips Page</h1>} />
+        <Route path="/apply-adoption/:petId" element={<ApplyAdoption />} />
+        <Route path="/my-applications" element={<MyApplications />} />
       </Routes>
     </BrowserRouter>
   );

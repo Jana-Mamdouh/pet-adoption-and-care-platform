@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Cart.css";
 
 const governorateFees = {
@@ -15,48 +16,27 @@ const governorateFees = {
 
 function Cart() {
     const [cart, setCart] = useState([]);
-    const [paymentMethod, setPaymentMethod] = useState("");
     const [governorate, setGovernorate] = useState("");
+    const [popup, setPopup] = useState({ show: false, message: "", type: "" });
+    const navigate = useNavigate();
 
-    const [popup, setPopup] = useState({
-        show: false,
-        message: "",
-        type: "",
-    });
-
-    const isLoggedIn =
-        localStorage.getItem("token") || localStorage.getItem("user");
+    const isLoggedIn = localStorage.getItem("token") || localStorage.getItem("user");
 
     useEffect(() => {
         setCart(JSON.parse(localStorage.getItem("petCart")) || []);
     }, []);
 
     const showPopup = (message, type) => {
-        setPopup({
-            show: true,
-            message,
-            type,
-        });
-
-        setTimeout(() => {
-            setPopup({
-                show: false,
-                message: "",
-                type: "",
-            });
-        }, 2500);
+        setPopup({ show: true, message, type });
+        setTimeout(() => setPopup({ show: false, message: "", type: "" }), 2500);
     };
 
     const removeFromCart = (id) => {
-        const updatedCart = cart.filter((pet) => pet._id !== id);
-
-        setCart(updatedCart);
-
-        localStorage.setItem("petCart", JSON.stringify(updatedCart));
-
+        const updated = cart.filter((pet) => pet._id !== id);
+        setCart(updated);
+        localStorage.setItem("petCart", JSON.stringify(updated));
         window.dispatchEvent(new Event("storageUpdated"));
-
-        showPopup("Pet removed from cart", "success");
+        showPopup("Removed from adoption list", "success");
     };
 
     const deliveryFee = governorateFees[governorate] || 0;
@@ -67,12 +47,14 @@ function Cart() {
 
     const total = donationTotal + deliveryFee;
 
-    const confirmOrder = () => {
+    const continueToAdoption = () => {
         if (!isLoggedIn) {
-            showPopup(
-                "You must login first to confirm adoption order",
-                "error"
-            );
+            showPopup("You must login first", "error");
+            return;
+        }
+
+        if (cart.length === 0) {
+            showPopup("Your adoption list is empty", "error");
             return;
         }
 
@@ -81,26 +63,17 @@ function Cart() {
             return;
         }
 
-        if (!paymentMethod) {
-            showPopup("Please choose payment method", "error");
-            return;
-        }
-
-        showPopup("Order confirmed successfully 🐾", "success");
+        navigate(`/apply-adoption/${cart[0]._id}`);
     };
 
     return (
         <div className="cart-page">
-            {popup.show && (
-                <div className={`popup ${popup.type}`}>
-                    {popup.message}
-                </div>
-            )}
+            {popup.show && <div className={`popup ${popup.type}`}>{popup.message}</div>}
 
-            <h1>Your Cart</h1>
+            <h1>Your Adoption List</h1>
 
             {cart.length === 0 ? (
-                <p>Your cart is empty</p>
+                <p>Your adoption list is empty</p>
             ) : (
                 <>
                     {cart.map((pet) => (
@@ -109,98 +82,37 @@ function Cart() {
 
                             <div>
                                 <h3>{pet.name}</h3>
-
                                 <p>Breed: {pet.breed}</p>
-
-                                <p>
-                                    Donation Fee: {pet.donationFee || 0} EGP
-                                </p>
-
+                                <p>Donation Fee: {pet.donationFee || 0} EGP</p>
                                 <p className="note">
-                                    These symbolic fees support donations,
-                                    food, vaccination, and rescue care.
+                                    These symbolic fees support donations, food, vaccination, and rescue care.
                                 </p>
                             </div>
 
-                            <button onClick={() => removeFromCart(pet._id)}>
-                                Remove
-                            </button>
+                            <button onClick={() => removeFromCart(pet._id)}>Remove</button>
                         </div>
                     ))}
 
                     <div className="checkout-box">
-                        <h2>Checkout</h2>
+                        <h2>Adoption Summary</h2>
 
                         <label>Choose Your Governorate</label>
-
-                        <select
-                            value={governorate}
-                            onChange={(e) => setGovernorate(e.target.value)}
-                        >
-                            <option value="">
-                                Select governorate
-                            </option>
-
+                        <select value={governorate} onChange={(e) => setGovernorate(e.target.value)}>
+                            <option value="">Select governorate</option>
                             {Object.keys(governorateFees).map((gov) => (
-                                <option key={gov} value={gov}>
-                                    {gov}
-                                </option>
+                                <option key={gov} value={gov}>{gov}</option>
                             ))}
                         </select>
 
-                        {governorate && (
-                            <p>
-                                Delivery Fee: {deliveryFee} EGP
-                            </p>
-                        )}
-
-                        <label>Payment Method</label>
-
-                        <select
-                            value={paymentMethod}
-                            onChange={(e) =>
-                                setPaymentMethod(e.target.value)
-                            }
-                        >
-                            <option value="">
-                                Choose payment method
-                            </option>
-
-                            <option value="cash">
-                                Cash on Delivery
-                            </option>
-
-                            <option value="card">
-                                Card
-                            </option>
-
-                            <option value="wallet">
-                                Mobile Wallet
-                            </option>
-                        </select>
-
-                        <p>
-                            Donation Total: {donationTotal} EGP
-                        </p>
-
-                        <p>
-                            Delivery Fee: {deliveryFee} EGP
-                        </p>
-
-                        <h3>
-                            Total Payment: {total} EGP
-                        </h3>
+                        <p>Donation Total: {donationTotal} EGP</p>
+                        <p>Delivery Fee: {deliveryFee} EGP</p>
+                        <h3>Total Expected Fees: {total} EGP</h3>
 
                         {!isLoggedIn && (
-                            <p className="login-warning">
-                                You must login first before confirming
-                                the order.
-                            </p>
+                            <p className="login-warning">You must login first before sending adoption request.</p>
                         )}
 
-                        <button onClick={confirmOrder}>
-                            Confirm Order
-                        </button>
+                        <button onClick={continueToAdoption}>Continue to Adoption Request</button>
                     </div>
                 </>
             )}
